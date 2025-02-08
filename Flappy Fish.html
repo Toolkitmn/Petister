@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Fish</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: black;
+        }
+        canvas {
+            background-color: black;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="gameCanvas" width="1900" height="900"></canvas>
+
+    <script>
+        var canvas = document.getElementById("gameCanvas");
+        var ctx = canvas.getContext("2d");
+
+        // Carica le immagini
+        var fish = new Image();
+        var pipes = new Image();
+        fish.src = "fish.jpg"; 
+        pipes.src = "pipes.jpg"; 
+
+        // Dimensioni del pesce e dei tubi
+        var fishWidth = 80, fishHeight = 80; 
+        var pipeWidth = 100, pipeGap = 300; 
+
+        // Posizioni iniziali
+        var pipeX = canvas.width;
+        var pipeY = Math.random() * (canvas.height - pipeGap - 200) + 100;
+        var fishX = 100, fishY = canvas.height / 2;
+        var ySpeed = 0, gravity = 0.25; // 💡 Diminuita la gravità
+        var score = 0, gameOver = false;
+        var gameTimer;
+
+        function mainLoop() {
+            if (gameOver) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Disegna i tubi
+            ctx.drawImage(pipes, pipeX, 0, pipeWidth, pipeY); 
+            ctx.drawImage(pipes, pipeX, pipeY + pipeGap, pipeWidth, canvas.height - (pipeY + pipeGap));
+
+            pipeX -= 4; 
+
+            if (pipeX <= -pipeWidth) {
+                pipeX = canvas.width;
+                pipeY = Math.random() * (canvas.height - pipeGap - 200) + 100;
+                score++;
+            }
+
+            // Disegna il pesce
+            ctx.drawImage(fish, fishX, fishY, fishWidth, fishHeight);
+
+            // Testo del punteggio
+            ctx.font = "30px Arial";
+            ctx.fillStyle = "lightgreen";
+            ctx.fillText("Score: " + score, 50, 50);
+
+            // Aggiorna posizione e velocità del pesce
+            ySpeed += gravity;
+            fishY += ySpeed;
+
+            checkCollision();
+        }
+
+        function checkCollision() {
+            if (fishY <= 0 || fishY + fishHeight >= canvas.height) {
+                endGame();
+                return;
+            }
+
+            if (
+                (fishX + fishWidth > pipeX && fishX < pipeX + pipeWidth) && 
+                (fishY < pipeY || fishY + fishHeight > pipeY + pipeGap) 
+            ) {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            clearInterval(gameTimer);
+            gameOver = true;
+            ctx.font = "80px Arial";
+            ctx.fillStyle = "lightgreen";
+            ctx.fillText("Game Over!", canvas.width / 2 - 200, canvas.height / 2);
+        }
+
+        document.onkeydown = function() {
+            if (!gameOver) {
+                ySpeed = -6; // 💡 Aumentata la spinta verso l'alto
+            }
+        };
+
+        fish.onload = pipes.onload = function() {
+            gameTimer = setInterval(mainLoop, 15);
+        };
+
+    </script>
+
+</body>
+</html>

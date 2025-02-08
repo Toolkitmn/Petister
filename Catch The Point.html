@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+<div id='board'></div>
+<div id='scoreBox'></div>
+
+<style>
+        #board{position:absolute;
+           width:1900px; height:900px;
+           background-color:black;}
+	#balloon{position:absolute;
+		-webkit-transition:all 0.2s;
+		height:50px;}
+        #scoreBox{position:absolute;
+                background-color:lightgreen;}
+</style>
+
+
+
+<img id='balloon' 
+src='C:\PETister\efvc_zuy5_230425.jpg'>
+<script>
+        balloon.addEventListener('click', clickedIt) ;
+        var score=0, count=0;
+
+     function clickedIt(){
+	score++;
+	scoreBox.innerHTML='score:'+score;
+	balloon.style.height='1px';
+
+}
+     function moveIt(){
+	balloon.style.height='50px';
+	balloon.style.left=Math.random()*1900+'px';
+	balloon.style.top=Math.random()*900+'px';
+	count++;
+	if(count==20)
+        {
+		alert('game over!');
+	        clearInterval(timer);
+		}
+	
+              }
+	var timer=setInterval(moveIt, 1000);
+
+</script>
+</html>

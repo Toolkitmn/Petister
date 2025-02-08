@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ping Pong</title>
+    <style>
+        body {
+            background-color: black;
+            overflow: hidden;
+        }
+        #board {
+            position: absolute;
+            width: 1900px;
+            height: 900px;
+            background-color: black;
+            border: 2px solid lightgreen;
+        }
+        #bat {
+            position: absolute;
+            bottom: 30px;
+            width: 200px;
+            height: 15px;
+            background-color: lightgreen;
+        }
+        #ball {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: lightgreen;
+        }
+        #scoreBox {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            font-family: 'Courier New', monospace;
+            color: lightgreen;
+        }
+    </style>
+</head>
+<body onmousemove="moveBat(event)">
+    <div id="board">
+        <div id="scoreBox">Score: 0</div>
+        <div id="bat"></div>
+        <div id="ball"></div>
+    </div>
+    <script>
+        var board = document.getElementById("board");
+        var bat = document.getElementById("bat");
+        var ball = document.getElementById("ball");
+        var scoreBox = document.getElementById("scoreBox");
+
+        var boardWidth = 1900, boardHeight = 900;
+        var batWidth = 200, batHeight = 15;
+        var ballSize = 20;
+        var ballX = 950, ballY = 450, speedX = 5, speedY = 5;
+        var batX = 850;
+        var score = 0;
+
+        function moveBat(event) {
+            batX = event.clientX - batWidth / 2;
+            if (batX < 0) batX = 0;
+            if (batX > boardWidth - batWidth) batX = boardWidth - batWidth;
+            bat.style.left = batX + "px";
+        }
+
+        function moveBall() {
+            ballX += speedX;
+            ballY += speedY;
+            ball.style.left = ballX + "px";
+            ball.style.top = ballY + "px";
+
+            // Collisioni con i bordi
+            if (ballX <= 0 || ballX >= boardWidth - ballSize) speedX *= -1;
+            if (ballY <= 0) speedY *= -1;
+
+            // Collisione con la racchetta
+            if (ballY + ballSize >= boardHeight - 30 &&
+                ballX + ballSize > batX &&
+                ballX < batX + batWidth) {
+                speedY *= -1;
+                score++;
+                scoreBox.innerHTML = "Score: " + score;
+            }
+
+            // Game Over
+            if (ballY > boardHeight) {
+                alert("Game Over! Final Score: " + score);
+                clearInterval(timer);
+                location.reload();
+            }
+        }
+
+        var timer = setInterval(moveBall, 10);
+    </script>
+</body>
+</html>

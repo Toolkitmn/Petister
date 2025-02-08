@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>High Scores</title>
+    <style>
+        body {
+            text-align: center;
+            background-color: black;
+            color: lightgreen;
+        }
+    </style>
+</head>
+<body>
+    <h1>High Scores</h1>
+    <ol id="scoreList"></ol>
+    <button onclick="window.location.href='spaceinvrader.html'">Back to Game</button>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const newScore = parseInt(urlParams.get('score')) || 0;
+        let scores = JSON.parse(localStorage.getItem("highscores")) || [];
+
+        if (newScore > 0) {
+            let name = prompt("Enter your name:") || "Anonymous";
+            scores.push({ name, score: newScore });
+            scores.sort((a, b) => b.score - a.score);
+            scores = scores.slice(0, 10);
+            localStorage.setItem("highscores", JSON.stringify(scores));
+        }
+
+        const scoreList = document.getElementById("scoreList");
+        scores.forEach(entry => {
+            let li = document.createElement("li");
+            li.textContent = `${entry.name}: ${entry.score}`;
+            scoreList.appendChild(li);
+        });
+    </script>
+</body>
+</html>

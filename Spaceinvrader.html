@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Invrader Clone</title>
+    <style>
+        body {
+            text-align: center;
+            background-color: black;
+            color: lightgreen;
+        }
+        canvas {
+            background-color: black;
+            display: block;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Space Invrader Clone</h1>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        
+        let player = { x: 375, y: 550, width: 50, height: 20, speed: 5, lives: 3 };
+        let bullets = [];
+        let aliens = [];
+        let alienBullets = [];
+        let walls = [{ x: 200, y: 500, width: 100, height: 50, health: 3 },
+                     { x: 500, y: 500, width: 100, height: 50, health: 3 }];
+        let score = 0;
+        let gameOver = false;
+        let alienDirection = 1;
+        let alienSpeed = 1;
+        
+        function drawPlayer() {
+            ctx.fillStyle = "lightgreen";
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+        }
+        
+        function drawAliens() {
+            ctx.fillStyle = "lightgreen";
+            aliens.forEach(alien => {
+                ctx.fillRect(alien.x, alien.y, alien.width, alien.height);
+            });
+        }
+        
+        function drawWalls() {
+            walls.forEach(wall => {
+                ctx.fillStyle = ["lightgreen", "lightgreen", "black"][3 - wall.health];
+                ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
+            });
+        }
+        
+        function drawBullets() {
+            ctx.fillStyle = "lightgreen";
+            bullets.forEach(bullet => ctx.fillRect(bullet.x, bullet.y, 5, 10));
+            alienBullets.forEach(bullet => ctx.fillRect(bullet.x, bullet.y, 5, 10));
+        }
+        
+        function update() {
+            if (gameOver) return;
+            bullets.forEach(bullet => bullet.y -= 5);
+            alienBullets.forEach(bullet => bullet.y += 3);
+            
+            aliens.forEach(alien => alien.x += alienDirection * alienSpeed);
+            
+            if (aliens.some(alien => alien.x <= 0 || alien.x >= canvas.width - alien.width)) {
+                alienDirection *= -1;
+                aliens.forEach(alien => alien.y += 20);
+            }
+            
+            if (Math.random() < 0.02 && aliens.length > 0) {
+                let shootingAlien = aliens[Math.floor(Math.random() * aliens.length)];
+                alienBullets.push({ x: shootingAlien.x + shootingAlien.width / 2, y: shootingAlien.y });
+            }
+            
+            aliens = aliens.filter(alien => {
+                let hit = bullets.some((bullet, index) => {
+                    if (bullet.x >= alien.x && bullet.x <= alien.x + alien.width &&
+                        bullet.y >= alien.y && bullet.y <= alien.y + alien.height) {
+                        bullets.splice(index, 1);
+                        score += 10;
+                        return true;
+                    }
+                    return false;
+                });
+                return !hit;
+            });
+            
+            alienBullets = alienBullets.filter(bullet => {
+                if (bullet.x >= player.x && bullet.x <= player.x + player.width &&
+                    bullet.y >= player.y && bullet.y <= player.y + player.height) {
+                    player.lives--;
+                    if (player.lives <= 0) {
+                        gameOver = true;
+                        setTimeout(() => window.location.href = "highscore.html?score=" + score, 2000);
+                    }
+                    return false;
+                }
+                return bullet.y < canvas.height;
+            });
+            
+            if (aliens.some(alien => alien.y > 500)) {
+                gameOver = true;
+                setTimeout(() => window.location.href = "highscore.html?score=" + score, 2000);
+            }
+        }
+        
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawPlayer();
+            drawAliens();
+            drawWalls();
+            drawBullets();
+            ctx.fillStyle = "lightgreen";
+            ctx.fillText("Score: " + score, 10, 20);
+            ctx.fillText("Lives: " + player.lives, 10, 40);
+        }
+        
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowLeft" && player.x > 0) player.x -= player.speed;
+            if (e.key === "ArrowRight" && player.x < canvas.width - player.width) player.x += player.speed;
+            if (e.key === " ") bullets.push({ x: player.x + player.width / 2, y: player.y });
+        });
+        
+        for (let i = 0; i < 5; i++) {
+            for (let j = 0; j < 8; j++) {
+                aliens.push({ x: j * 80 + 50, y: i * 50 + 50, width: 40, height: 30 });
+            }
+        }
+        
+        gameLoop();
+    </script>
+</body>
+</html>

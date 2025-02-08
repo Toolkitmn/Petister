@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catch The Apple</title>
+    <style>
+        body {
+            background-color: black;
+            text-align: center;
+        }
+        canvas {
+            background-color: black;
+            border: 2px solid lightgreen;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="1900" height="900"></canvas>
+    <div style="display: none;">
+        <img id="apple" src="C:\PETister\apple.jpg">
+        <img id="monster" src="C:\PETister\monster.jpg">
+    </div>
+
+    <script>
+        window.onload = function() {
+            var canvas = document.getElementById("gameCanvas");
+            var ctx = canvas.getContext("2d");
+            var apple = document.getElementById("apple");
+            var monster = document.getElementById("monster");
+
+            var canvasWidth = 1900, canvasHeight = 900;
+            var appleSize = 100, monsterSize = 150;
+            var appleX = Math.random() * (canvasWidth - appleSize), appleY = -appleSize;
+            var monsterX = canvasWidth / 2, monsterSpeed = 0, monsterSpeedValue = 10;
+            var appleFallSpeed = 7, score = 0;
+            var gameTimer = setInterval(mainloop, 20);
+
+            function mainloop() {
+                ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+                ctx.fillStyle = "lightgreen";
+                ctx.font = "40px Arial";
+                ctx.fillText("Score: " + score, 20, 50);
+
+                // Disegna la mela
+                ctx.drawImage(apple, appleX, appleY, appleSize, appleSize);
+                appleY += appleFallSpeed;
+                if (appleY > canvasHeight) {
+                    appleY = -appleSize;
+                    appleX = Math.random() * (canvasWidth - appleSize);
+                }
+
+                // Disegna il mostro
+                ctx.drawImage(monster, monsterX, canvasHeight - monsterSize - 30, monsterSize, monsterSize);
+                monsterX += monsterSpeed;
+
+                // Evita che il mostro esca dai bordi
+                if (monsterX < 0) monsterX = 0;
+                if (monsterX > canvasWidth - monsterSize) monsterX = canvasWidth - monsterSize;
+
+                checkForHits();
+            }
+
+            document.onkeydown = function(e) {
+                var k = e.keyCode;
+                if (k == 37) { monsterSpeed = -monsterSpeedValue; }  // Sinistra
+                if (k == 39) { monsterSpeed = monsterSpeedValue; }   // Destra
+            };
+
+            document.onkeyup = function(e) {
+                monsterSpeed = 0;
+            };
+
+            function checkForHits() {
+                if (appleY + appleSize > canvasHeight - monsterSize - 30 &&
+                    appleX + appleSize > monsterX &&
+                    appleX < monsterX + monsterSize) {
+                    score++;
+                    appleY = -appleSize;
+                    appleX = Math.random() * (canvasWidth - appleSize);
+                }
+            }
+
+            setTimeout(gameOver, 30000);
+            function gameOver() {
+                clearInterval(gameTimer);
+                ctx.font = "80px Arial";
+                ctx.fillStyle = "lightgreen";
+                ctx.fillText("Game Over!", canvasWidth / 2 - 200, canvasHeight / 2);
+            }
+        };
+    </script>
+</body>
+</html>
