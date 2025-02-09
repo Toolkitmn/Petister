@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background: url('file:///C:/PETister/stars.jpg') no-repeat center center fixed;
+            background-size: cover;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="1900" height="900"></canvas>
+    <script>
+        var canvas = document.getElementById("gameCanvas");
+        var ctx = canvas.getContext("2d");
+
+        var rocket = new Image();
+        rocket.src = 'file:///C:/PETister/rocket.jpg';
+        var meteor = new Image();
+        meteor.src = 'file:///C:/PETister/meteor.jpg';
+
+        var x = [1900, 1900, 1900, 1900, 1900];
+        var y = [50, 200, 400, 600, 750];
+        var speed = [-3, -2.5, -1.8, -2.2, -2.0];
+        var rocketY = 400;
+        var changeY = 0;
+        var score = 0;
+        var gameTimer = setInterval(mainLoop, 20);
+
+        function mainLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            moveMeteors();
+            moveRocket();
+        }
+
+        function moveMeteors() {
+            for (var n = 0; n < 5; n++) {
+                ctx.drawImage(meteor, x[n], y[n], 80, 80);
+                x[n] += speed[n];
+                checkForHits(n);
+                if (x[n] < -80) {
+                    x[n] = canvas.width;
+                    y[n] = Math.random() * (canvas.height - 80);
+                }
+            }
+        }
+
+        function moveRocket() {
+            ctx.drawImage(rocket, 50, rocketY, 80, 80);
+            rocketY += changeY;
+            score++;
+            ctx.fillStyle = "lightgreen";
+            ctx.font = "30px Arial";
+            ctx.fillText("Score: " + score, 10, 30);
+            if (rocketY <= 0 || rocketY >= canvas.height - 80) {
+                changeY = 0;
+            }
+        }
+
+        document.onkeydown = function (e) {
+            if (e.keyCode == 38) changeY = -5;
+            if (e.keyCode == 40) changeY = 5;
+        };
+
+        document.onkeyup = function (e) {
+            if (e.keyCode == 38 || e.keyCode == 40) changeY = 0;
+        };
+
+        function checkForHits(n) {
+            if (Math.abs(x[n] - 50) < 30 && Math.abs(rocketY - y[n]) < 50) {
+                clearInterval(gameTimer);
+                ctx.fillStyle = "lightgreen";
+                ctx.font = "80px Arial";
+                ctx.fillText("Game Over!", canvas.width / 2 - 200, canvas.height / 2);
+            }
+        }
+    </script>
+</body>
+</html>
