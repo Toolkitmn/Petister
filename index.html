@@ -37,16 +37,31 @@
             background-color: green;
             color: white;
         }
-        #programArea {
+        #programAreaContainer {
             display: none;
-            margin-top: 20px;
+            margin-top: 40px;
             width: 80%;
-            height: 200px;
+            height: 400px; /* Increased size of the text area */
             background-color: black;
             color: lightgreen;
             border: 1px solid lightgreen;
             padding: 10px;
             font-family: 'Courier New', monospace;
+            resize: none;
+            margin-bottom: 20px;
+            justify-content: center;
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+        }
+        #programArea {
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            color: lightgreen;
+            border: 1px solid lightgreen;
+            font-family: 'Courier New', monospace;
+            padding: 10px;
             resize: none;
         }
         #saveButton, #resetButton {
@@ -92,7 +107,6 @@
     
     <div class="button-container">
         <button onclick="showProgramArea()">Program</button>
-        <div id="launchButtonContainer"></div>
     </div>
 
     <!-- Text area to write code -->
@@ -101,14 +115,13 @@
         <button id="saveButton" onclick="saveCode()">Save and Launch</button>
         <button id="resetButton" onclick="resetProgram()">Reset</button>
     </div>
-    
+
     <script>
         let savedFileName = '';
 
         function showProgramArea() {
-            // Show the text area and buttons
+            // Show the text area and buttons after pressing "Program"
             document.getElementById("programAreaContainer").style.display = "flex";
-            document.getElementById("programArea").style.display = "block";
             document.getElementById("saveButton").style.display = "block";
             document.getElementById("resetButton").style.display = "block";
         }
@@ -130,8 +143,8 @@
             // Store the filename
             savedFileName = "custom_program.html";
 
-            // Create a new button for the saved program
-            createLaunchButton(savedFileName);
+            // Show a reminder to move the file to Downloads folder manually
+            alert("Your program has been saved! It can be launched from your Downloads folder by clicking the file manually.");
 
             // Reset the text area and hide the buttons
             resetProgram();
@@ -140,38 +153,9 @@
         function resetProgram() {
             // Clear the text area and hide buttons
             document.getElementById("programArea").value = '';
-            document.getElementById("programArea").style.display = "none";
+            document.getElementById("programAreaContainer").style.display = "none"; // Hide the program window
             document.getElementById("saveButton").style.display = "none";
             document.getElementById("resetButton").style.display = "none";
-        }
-
-        function createLaunchButton(filename) {
-            // Create a new button that will launch the saved program
-            var container = document.getElementById("launchButtonContainer");
-            var button = document.createElement("button");
-            button.innerHTML = "Launch " + filename;
-            button.onclick = function() {
-                // Display instructions to move the file to C:\PETister manually
-                alert("The file is saved in your Downloads folder. Please move it to C:\\PETister and then click 'Launch' again.");
-            };
-            container.appendChild(button);
-
-            // Add a delete button to remove the program and button
-            var deleteButton = document.createElement("button");
-            deleteButton.innerHTML = "Delete " + filename;
-            deleteButton.onclick = function() {
-                deleteProgram(filename, button, deleteButton);
-            };
-            container.appendChild(deleteButton);
-        }
-
-        function deleteProgram(filename, launchButton, deleteButton) {
-            // Remove the launch and delete buttons
-            launchButton.remove();
-            deleteButton.remove();
-
-            // Optionally, you can also delete the file (but it's just a local file, so this is for UI cleanup)
-            savedFileName = '';
         }
     </script>
 </body>
