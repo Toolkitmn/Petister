@@ -41,7 +41,7 @@
             display: none;
             margin-top: 40px;
             width: 80%;
-            height: 400px; /* Increased size of the text area */
+            height: 400px;
             background-color: black;
             color: lightgreen;
             border: 1px solid lightgreen;
@@ -82,7 +82,7 @@
 <body>
     <h1></h1>
     <p>********  PETister BASIC  ********</p>
-    <p>7167 BYTES FREE<br>READY.</p>
+    <p id="ramSpace">Loading RAM Free...</p>
 
     <div class="button-container">
         <a href="C:\PETister\Catch The Apple.html">
@@ -122,6 +122,12 @@
     <script>
         let savedFileName = '';
 
+        // Function to simulate loading free disk space
+        function loadDiskSpace() {
+            const freeSpace = Math.floor(Math.random() * (1000000 - 500000) + 500000);  // Simulated value
+            document.getElementById('ramSpace').innerText = `${freeSpace} BYTES FREE\nREADY.`;
+        }
+
         function showProgramArea() {
             // Show the text area and buttons after pressing "Program"
             document.getElementById("programAreaContainer").style.display = "flex";
@@ -160,6 +166,9 @@
             document.getElementById("saveButton").style.display = "none";
             document.getElementById("resetButton").style.display = "none";
         }
+
+        // Load the disk space when the page is loaded
+        window.onload = loadDiskSpace;
     </script>
 </body>
 </html>
