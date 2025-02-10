@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: black;
+        }
+        canvas {
+            border: 10px solid lightgreen;
+        }
+        #score {
+            position: absolute;
+            top: 30px;
+            left: 20px;
+            color: lightgreen;
+            font-size: 20px;
+            z-index: 10;
+            font-family: 'Arial', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="score">Score: 0</div>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const gridSize = 20;
+        let snake = [{ x: 160, y: 160 }];
+        let direction = { x: gridSize, y: 0 };
+        let food = { x: 0, y: 0 };
+        let score = 0;
+        let speed = 100;
+
+        // Funzione per generare la posizione della mela
+        function randomFoodPosition() {
+            food.x = Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize;
+            food.y = Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize;
+
+            // Assicurati che la mela non si generi dove si trova il serpente
+            if (snake.some(segment => segment.x === food.x && segment.y === food.y)) {
+                randomFoodPosition();
+            }
+        }
+
+        // Funzione per disegnare lo snake
+        function drawSnake() {
+            snake.forEach(segment => {
+                ctx.fillStyle = 'lightgreen';
+                ctx.fillRect(segment.x, segment.y, gridSize, gridSize);
+            });
+        }
+
+        // Funzione per disegnare la mela
+        function drawFood() {
+            ctx.fillStyle = 'lightgreen';
+            ctx.fillRect(food.x, food.y, gridSize, gridSize);
+        }
+
+        // Funzione per aggiornare la posizione dello snake
+        function updateSnake() {
+            const newHead = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+
+            // Verifica se lo snake colpisce il bordo o se si scontra con se stesso
+            if (
+                newHead.x < 0 || newHead.x >= canvas.width ||
+                newHead.y < 0 || newHead.y >= canvas.height ||
+                snake.some(segment => segment.x === newHead.x && segment.y === newHead.y)
+            ) {
+                gameOver();
+                return;
+            }
+
+            snake.unshift(newHead);
+
+            // Se lo snake mangia la mela
+            if (newHead.x === food.x && newHead.y === food.y) {
+                score++;
+                if (score === 10) {
+                    alert('Hai vinto!');
+                    resetGame();
+                }
+                randomFoodPosition();  // Crea una nuova mela
+                if (speed > 50) speed -= 10;  // Aumenta la velocità
+            } else {
+                snake.pop();  // Rimuove l'ultimo segmento se non ha mangiato la mela
+            }
+        }
+
+        // Funzione per disegnare il bordo
+        function drawBorder() {
+            ctx.strokeStyle = 'lightgreen';
+            ctx.lineWidth = 10;
+            ctx.strokeRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // Funzione per disegnare tutto
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBorder();
+            drawSnake();
+            drawFood();
+            document.getElementById('score').textContent = `Score: ${score}`;
+            updateSnake();
+        }
+
+        // Funzione per gestire la fine del gioco
+        function gameOver() {
+            alert('Game Over!');
+            resetGame();
+        }
+
+        // Funzione per resettare il gioco
+        function resetGame() {
+            snake = [{ x: 160, y: 160 }];
+            direction = { x: gridSize, y: 0 };
+            score = 0;
+            speed = 100;
+            randomFoodPosition();  // Posiziona la prima mela
+        }
+
+        // Controllo dei tasti per muovere lo snake
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp' && direction.y === 0) direction = { x: 0, y: -gridSize };
+            if (e.key === 'ArrowDown' && direction.y === 0) direction = { x: 0, y: gridSize };
+            if (e.key === 'ArrowLeft' && direction.x === 0) direction = { x: -gridSize, y: 0 };
+            if (e.key === 'ArrowRight' && direction.x === 0) direction = { x: gridSize, y: 0 };
+        });
+
+        // Avvia il gioco
+        randomFoodPosition();  // Posiziona la prima mela
+        setInterval(draw, speed); // Avvia il ciclo di disegno a intervalli
+    </script>
+</body>
+</html>
