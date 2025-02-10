@@ -82,7 +82,16 @@
 <body>
     <h1></h1>
     <p>********  PETister BASIC  ********</p>
-    <p id="ramSpace">Loading RAM Free...</p>
+    <p id="ramSpace"></p>
+    <p>READY <img src="cursor.gif" alt="Blinking Cursor" style="width:20px; height:20px;"></p>
+
+    <script>
+        function loadDiskSpace() {
+            const freeSpace = Math.floor(Math.random() * (8000 - 7000 + 1) + 7000); // Random between 7000 and 8000
+            document.getElementById('ramSpace').innerText = `${freeSpace} BYTES FREE`;
+        }
+        window.onload = loadDiskSpace;
+    </script>
 
     <div class="button-container">
         <a href="C:\PETister\Catch The Apple.html">
@@ -120,55 +129,32 @@
     </div>
 
     <script>
-        let savedFileName = '';
-
-        // Function to simulate loading free disk space
-        function loadDiskSpace() {
-            const freeSpace = Math.floor(Math.random() * (1000000 - 500000) + 500000);  // Simulated value
-            document.getElementById('ramSpace').innerText = `${freeSpace} BYTES FREE\nREADY.`;
-        }
-
         function showProgramArea() {
-            // Show the text area and buttons after pressing "Program"
             document.getElementById("programAreaContainer").style.display = "flex";
             document.getElementById("saveButton").style.display = "block";
             document.getElementById("resetButton").style.display = "block";
         }
 
         function saveCode() {
-            // Get the code from the textarea
             const code = document.getElementById("programArea").value;
-
-            // Create a Blob with the code and make it downloadable
             const blob = new Blob([code], { type: "text/html" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = "custom_program.html"; // Name of the downloaded HTML file
+            a.download = "custom_program.html";
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-
-            // Store the filename
-            savedFileName = "custom_program.html";
-
-            // Show a reminder to move the file to Downloads folder manually
             alert("Your program has been saved! It can be launched from your Downloads folder by clicking the file manually.");
-
-            // Reset the text area and hide the buttons
             resetProgram();
         }
 
         function resetProgram() {
-            // Clear the text area and hide buttons
             document.getElementById("programArea").value = '';
-            document.getElementById("programAreaContainer").style.display = "none"; // Hide the program window
+            document.getElementById("programAreaContainer").style.display = "none";
             document.getElementById("saveButton").style.display = "none";
             document.getElementById("resetButton").style.display = "none";
         }
-
-        // Load the disk space when the page is loaded
-        window.onload = loadDiskSpace;
     </script>
 </body>
 </html>
