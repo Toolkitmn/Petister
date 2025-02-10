@@ -8,3 +8,5 @@ new Game and a button in HTML coding inside the interface index.html file linkin
 maintain that retro style. This project was built in 2025.
 
 IDEA: It is possible to build a retro style Computer with this interface a PC with a retro case, windows or linux etc. by adding at startup a browser linked to the local page of this Project; index.html.
+REMEMBER: if you are in linux you have to change the path of every page inside index and images inside the various games to the path you save PETister in your Linux PC, i have try it in my Raspberry pi 400 
+and it works fine.
