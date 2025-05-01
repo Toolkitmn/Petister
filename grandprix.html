@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Formula 1 Monochrome Road</title>
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+        background-color: black;
+        color: limegreen;
+        font-family: monospace;
+    }
+    #gameCanvas {
+        background: black;
+        display: block;
+        margin: 0 auto;
+    }
+    #score {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        font-size: 20px;
+    }
+</style>
+</head>
+<body>
+<canvas id="gameCanvas" width="400" height="600"></canvas>
+<div id="score">Score: 0</div>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+let player = {
+    x: canvas.width / 2 - 15,
+    y: canvas.height - 80,
+    width: 30,
+    height: 50,
+    speed: 5
+};
+
+let enemies = [];
+let enemySpeed = 3;
+let score = 0;
+let gameOver = false;
+let laneLineOffset = 0; // per animare la linea centrale
+
+function createEnemy() {
+    const roadWidth = canvas.width - 100;
+    const enemyWidth = 30;
+    const minX = 50;
+    const maxX = 50 + roadWidth - enemyWidth;
+
+    const enemy = {
+        x: Math.random() * (maxX - minX) + minX,
+        y: -50,
+        width: enemyWidth,
+        height: 50
+    };
+    enemies.push(enemy);
+}
+
+function drawRoadLines() {
+    ctx.strokeStyle = 'limegreen';
+    ctx.lineWidth = 4;
+    
+    // Linee laterali
+    ctx.beginPath();
+    ctx.moveTo(50, 0);
+    ctx.lineTo(50, canvas.height);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(canvas.width - 50, 0);
+    ctx.lineTo(canvas.width - 50, canvas.height);
+    ctx.stroke();
+
+    // Linea centrale spezzettata
+    ctx.lineWidth = 2;
+    const segmentLength = 20;
+    const gap = 20;
+    let y = laneLineOffset;
+
+    while (y < canvas.height) {
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2, y);
+        ctx.lineTo(canvas.width / 2, y + segmentLength);
+        ctx.stroke();
+        y += segmentLength + gap;
+    }
+}
+
+function drawPlayer() {
+    ctx.fillStyle = 'limegreen';
+    ctx.fillRect(player.x, player.y, player.width, player.height);
+}
+
+function drawEnemies() {
+    ctx.fillStyle = 'limegreen';
+    enemies.forEach(enemy => {
+        ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+    });
+}
+
+function moveEnemies() {
+    enemies.forEach(enemy => {
+        enemy.y += enemySpeed;
+    });
+    enemies = enemies.filter(enemy => enemy.y < canvas.height);
+}
+
+function detectCollision() {
+    enemies.forEach(enemy => {
+        if (
+            player.x < enemy.x + enemy.width &&
+            player.x + player.width > enemy.x &&
+            player.y < enemy.y + enemy.height &&
+            player.height + player.y > enemy.y
+        ) {
+            gameOver = true;
+        }
+    });
+}
+
+function updateScore() {
+    score++;
+    document.getElementById("score").innerText = "Score: " + score;
+}
+
+function gameLoop() {
+    if (gameOver) {
+        ctx.fillStyle = "limegreen";
+        ctx.font = "30px monospace";
+        ctx.fillText("Game Over", canvas.width / 2 - 80, canvas.height / 2);
+        return;
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    drawRoadLines();
+    drawPlayer();
+    drawEnemies();
+    moveEnemies();
+    detectCollision();
+    updateScore();
+
+    laneLineOffset += 5;
+    if (laneLineOffset > 40) {
+        laneLineOffset = 0;
+    }
+
+    requestAnimationFrame(gameLoop);
+}
+
+// Controls
+document.addEventListener("keydown", function(e) {
+    if (e.key === "ArrowLeft" && player.x > 50) {
+        player.x -= player.speed;
+    }
+    if (e.key === "ArrowRight" && player.x < canvas.width - 50 - player.width) {
+        player.x += player.speed;
+    }
+});
+
+// Enemy generator
+setInterval(createEnemy, 1000);
+
+gameLoop();
+</script>
+</body>
+</html>
